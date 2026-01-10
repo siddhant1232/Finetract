@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="green">#FF00DD00</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="red">#FFDD0000</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="white">#FFFFFFFF</color>
+    <string name="app_name">Finetract</string>
+    <string name="daily_limit_label">Daily Spending Limit</string>
+    <string name="enter_limit">Enter Amount</string>
+    <string name="grant_permission">Grant Permission</string>
+    <string name="permission_required_desc">Finetract needs access to notifications to track your UPI expenses automatically. We do not access other data.</string>
+    <string name="permission_required_title">Notification Permission Required</string>
+    <string name="save">Save</string>
+    <string name="status_alert">Limit Crossed!</string>
+    <string name="status_label">Status</string>
+    <string name="status_ok">Within Limit</string>
+    <string name="today_spend_label">Today\'s Spending</string>
+    <string name="update_limit">Update Limit</string>
+    <style name="Theme.Finetract" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        
+    </style>
+</resources>
