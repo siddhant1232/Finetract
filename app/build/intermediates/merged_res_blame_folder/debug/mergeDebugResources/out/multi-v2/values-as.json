@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.finetract.app-mergeDebugResources-26:/values-as/values-as.xml",
+            "outputFile": "com.finetract.app-mergeDebugResources-35:/values-as/values-as.xml",
             "map": [
                 {
                     "source": "/Users/apple/.gradle/caches/8.10.2/transforms/e1cea218e74a4044b396288e7d4fed6c/transformed/appcompat-1.6.1/res/values-as/values-as.xml",

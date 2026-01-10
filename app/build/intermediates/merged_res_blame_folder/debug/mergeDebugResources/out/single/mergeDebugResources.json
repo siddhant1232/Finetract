@@ -1,18 +1,26 @@
 [
     {
-        "merged": "com.finetract.app-debug-28:/xml_data_extraction_rules.xml.flat",
-        "source": "com.finetract.app-main-30:/xml/data_extraction_rules.xml"
+        "merged": "com.finetract.app-debug-37:/menu_bottom_nav_menu.xml.flat",
+        "source": "com.finetract.app-main-39:/menu/bottom_nav_menu.xml"
     },
     {
-        "merged": "com.finetract.app-debug-28:/layout_activity_main.xml.flat",
-        "source": "com.finetract.app-main-30:/layout/activity_main.xml"
+        "merged": "com.finetract.app-debug-37:/xml_data_extraction_rules.xml.flat",
+        "source": "com.finetract.app-main-39:/xml/data_extraction_rules.xml"
     },
     {
-        "merged": "com.finetract.app-debug-28:/xml_backup_rules.xml.flat",
-        "source": "com.finetract.app-main-30:/xml/backup_rules.xml"
+        "merged": "com.finetract.app-debug-37:/layout_fragment_settings.xml.flat",
+        "source": "com.finetract.app-main-39:/layout/fragment_settings.xml"
     },
     {
-        "merged": "com.finetract.app-debug-28:/layout_activity_settings.xml.flat",
-        "source": "com.finetract.app-main-30:/layout/activity_settings.xml"
+        "merged": "com.finetract.app-debug-37:/xml_backup_rules.xml.flat",
+        "source": "com.finetract.app-main-39:/xml/backup_rules.xml"
+    },
+    {
+        "merged": "com.finetract.app-debug-37:/layout_fragment_home.xml.flat",
+        "source": "com.finetract.app-main-39:/layout/fragment_home.xml"
+    },
+    {
+        "merged": "com.finetract.app-debug-37:/layout_activity_main.xml.flat",
+        "source": "com.finetract.app-main-39:/layout/activity_main.xml"
     }
 ]

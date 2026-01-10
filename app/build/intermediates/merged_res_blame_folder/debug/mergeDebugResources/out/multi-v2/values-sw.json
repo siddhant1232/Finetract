@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.finetract.app-mergeDebugResources-26:/values-sw/values-sw.xml",
+            "outputFile": "com.finetract.app-mergeDebugResources-35:/values-sw/values-sw.xml",
             "map": [
                 {
                     "source": "/Users/apple/.gradle/caches/8.10.2/transforms/2452517046d9f64093f5050250c11b7b/transformed/material-1.9.0/res/values-sw/values-sw.xml",
