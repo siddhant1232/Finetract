@@ -18,7 +18,7 @@ object TransactionManager {
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
     }
 
-    private fun getTodayDate(): String {
+    fun getTodayDate(): String {
         return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
     }
 
@@ -34,6 +34,9 @@ object TransactionManager {
             // It's a new day, archive yesterday's data
             val lastSpend = prefs.getFloat(KEY_TODAY_SPEND, 0f)
             val lastLimit = prefs.getFloat(KEY_DAILY_LIMIT, 5000f) // approximate limit at time of reset
+            
+            // --- X-Factor Reset Hook ---
+            XFactorManager.onDailyReset(context, lastSpend, lastLimit)
             
             // Append to history
             val history = prefs.getString(KEY_HISTORY, "") ?: ""
@@ -170,6 +173,25 @@ object TransactionManager {
         }
     }
 
+    data class TodayStats(val count: Int, val maxAmount: Float, val maxCategory: String)
+
+    fun getTodayStats(context: Context): TodayStats {
+        val all = getTransactions(context)
+        val todayStr = getTodayDate()
+        val todayTxns = all.filter { 
+             SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(it.timestamp)) == todayStr 
+        }
+        
+        if (todayTxns.isEmpty()) return TodayStats(0, 0f, "")
+        
+        val maxTxn = todayTxns.maxByOrNull { it.amount }
+        return TodayStats(
+            todayTxns.size,
+            maxTxn?.amount ?: 0f,
+            maxTxn?.category ?: ""
+        )
+    }
+
     data class TransactionRecord(val timestamp: Long, val merchant: String, val amount: Float, val category: String)
 
     fun addTransaction(
@@ -231,6 +253,10 @@ object TransactionManager {
             .putStringSet(KEY_PROCESSED_TXNS, newSet)
             .putString(KEY_TRANSACTION_LOG, newLog)
             .apply()
+            
+        // --- X-Factor Updates ---
+        XFactorManager.updateWeekendStats(context, amount)
+        XFactorManager.checkBigSpend(context, amount) // Check for warning (could trigger notification if we wanted, but logic is passive for now)
 
         return true
     }

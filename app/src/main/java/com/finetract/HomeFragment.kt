@@ -25,8 +25,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         val limit = TransactionManager.getDailyLimit(context)
         val remaining = limit - spend
         
-        // Progress Logic
+        // 1. Progress & Daily Insight
         val progress = if (limit > 0) ((spend / limit) * 100).toInt() else 0
+        val ratio = if (limit > 0) spend / limit else 0f
         
         // Color Logic
         val colorRes = when {
@@ -36,34 +37,50 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
         val statusColor = ContextCompat.getColor(context, colorRes)
 
-        // Bind UI
+        // Bind Main Progress
         view?.findViewById<TextView>(R.id.tv_spend_amount)?.text = "₹${spend.toInt()}"
         view?.findViewById<TextView>(R.id.tv_limit_info)?.text = getString(R.string.label_spent_of) + " ₹${limit.toInt()}"
         
         val progressBar = view?.findViewById<com.google.android.material.progressindicator.CircularProgressIndicator>(R.id.progress_limit)
-        progressBar?.progress = progress.coerceIn(0, 100)
-        progressBar?.setIndicatorColor(statusColor)
         
-        // Bind Remaining View
-        val tvRemaining = view?.findViewById<TextView>(R.id.tv_remaining_amount)
-        if (remaining < 0) {
-            tvRemaining?.text = "-₹${kotlin.math.abs(remaining.toInt())}"
-            tvRemaining?.setTextColor(ContextCompat.getColor(context, R.color.danger_red))
-        } else {
-            tvRemaining?.text = "₹${remaining.toInt()}"
-            tvRemaining?.setTextColor(ContextCompat.getColor(context, R.color.primary))
-        }
+        // Animation: Smooth Progress
+        val animator = android.animation.ObjectAnimator.ofInt(progressBar, "progress", progressBar?.progress ?: 0, progress.coerceIn(0, 100))
+        animator.duration = 800 // Smooth transition
+        animator.interpolator = android.view.animation.DecelerateInterpolator()
+        animator.start()
+        
+        progressBar?.setIndicatorColor(statusColor)
 
-        // Status Message
-        val statusMsg = view?.findViewById<TextView>(R.id.tv_status_message)
-        if (spend > limit) {
-             statusMsg?.text = getString(R.string.status_alert)
-             statusMsg?.setTextColor(statusColor)
-        } else {
-             statusMsg?.text = getString(R.string.positive_reinforcement)
-             statusMsg?.setTextColor(ContextCompat.getColor(context, R.color.success_green))
+        // Bind Daily Insight (Mandatory)
+        val tvInsight = view?.findViewById<TextView>(R.id.tv_daily_insight)
+        tvInsight?.text = when {
+            ratio <= 0.6f -> "You’re well within your limit today."
+            ratio <= 0.9f -> "You’re getting close to today’s limit."
+            else -> "You’ve crossed today’s limit."
         }
+        tvInsight?.setTextColor(statusColor)
+        
+        // 2. Today at a Glance
+        val stats = TransactionManager.getTodayStats(context)
+        view?.findViewById<TextView>(R.id.tv_glance_txns)?.text = "• ${stats.count} transactions today"
+        
+        val maxText = if (stats.maxAmount > 0) "• Highest: ₹${stats.maxAmount.toInt()} (${stats.maxCategory})" else "• Highest: -"
+        view?.findViewById<TextView>(R.id.tv_glance_highest)?.text = maxText
+        
+        view?.findViewById<TextView>(R.id.tv_glance_remaining)?.text = "• Remaining: ₹${remaining.toInt()}"
 
+        // 3. Behavioral Nudge (X-Factor / Contextual)
+        val tvNudge = view?.findViewById<TextView>(R.id.tv_nudge)
+        
+        // Simple Logic for Nudge as requested
+        val nudgeText = when {
+            // Priority: Weekend -> Near Limit -> Under Limit
+            XFactorManager.getWeekendWarning(context) != null -> XFactorManager.getWeekendWarning(context)
+            ratio > 0.8f && ratio <= 1.0f -> "Consider slowing down for the rest of the day."
+            else -> "Great control so far 👏" // Default positive reinforcement
+        }
+        tvNudge?.text = nudgeText
+        
         // Add Click Listener to open Analytics
         view?.findViewById<View>(R.id.container_progress)?.setOnClickListener {
             parentFragmentManager.beginTransaction()
