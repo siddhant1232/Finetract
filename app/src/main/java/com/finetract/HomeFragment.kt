@@ -142,7 +142,30 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
         
         tvNudge?.backgroundTintList = ColorStateList.valueOf(android.graphics.Color.parseColor(pillColor))
-        tvNudge?.setTextColor(ContextCompat.getColor(context, if (progress >= 90 && ratio <= 1.0f) R.color.text_primary else pillText)) 
+        tvNudge?.setTextColor(ContextCompat.getColor(context, if (progress >= 90 && ratio <= 1.0f) R.color.text_primary else pillText))
+
+        // --- 6. Spending Streak Badge ---
+        val currentStreak = TransactionManager.getCurrentStreak(context)
+        val tvStreak = view?.findViewById<TextView>(R.id.tv_streak_badge)
+        
+        if (currentStreak >= 2) {
+            tvStreak?.visibility = View.VISIBLE
+            tvStreak?.text = "🔥 $currentStreak Days On Track"
+        } else {
+            tvStreak?.visibility = View.GONE
+        }
+        
+        // --- 7. Streak Celebration / Reset Messaging ---
+        val celebration = TransactionManager.getStreakCelebrationMessage(context)
+        if (celebration != null) {
+            android.widget.Toast.makeText(context, celebration, android.widget.Toast.LENGTH_LONG).show()
+        }
+        
+        val wasStreakBroken = TransactionManager.wasStreakBrokenToday(context)
+        if (wasStreakBroken) {
+            android.widget.Toast.makeText(context, "Today was a break day. Let's continue tomorrow.", android.widget.Toast.LENGTH_SHORT).show()
+            TransactionManager.clearStreakBrokenFlag(context)
+        } 
 
         // --- Click Action with Haptics & Privacy Toggle (Double Tap) ---
         val gestureDetector = android.view.GestureDetector(context, object : android.view.GestureDetector.SimpleOnGestureListener() {

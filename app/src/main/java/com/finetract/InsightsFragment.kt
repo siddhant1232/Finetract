@@ -92,8 +92,13 @@ class InsightsFragment : Fragment(R.layout.fragment_insights) {
         
         val avg = totalSpend / recent.size
         
+        
         view?.findViewById<TextView>(R.id.tv_stat_on_track)?.text = "$onTrackCount/${recent.size}"
         view?.findViewById<TextView>(R.id.tv_stat_avg)?.text = "₹${avg.toInt()}"
+        
+        // Best Streak
+        val bestStreak = TransactionManager.getBestStreak(requireContext())
+        view?.findViewById<TextView>(R.id.tv_stat_best_streak)?.text = if (bestStreak > 0) "$bestStreak" else "--"
     }
 
     private fun updateCalendar() {

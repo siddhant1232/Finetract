@@ -24,6 +24,11 @@ object TransactionManager {
 
     data class DailyRecord(val date: String, val spend: Float, val limit: Float)
 
+    private const val KEY_CURRENT_STREAK = "current_streak"
+    private const val KEY_BEST_STREAK = "best_streak"
+    private const val KEY_LAST_CELEBRATION = "last_celebration_milestone"
+    private const val KEY_STREAK_BROKEN_TODAY = "streak_broken_today"
+
     // Checks date and resets if it's a new day
     fun checkAndReset(context: Context) {
         val prefs = getPrefs(context)
@@ -33,7 +38,15 @@ object TransactionManager {
         if (lastDate != "" && lastDate != today) {
             // It's a new day, archive yesterday's data
             val lastSpend = prefs.getFloat(KEY_TODAY_SPEND, 0f)
-            val lastLimit = prefs.getFloat(KEY_DAILY_LIMIT, 5000f) // approximate limit at time of reset
+            val lastLimit = prefs.getFloat(KEY_DAILY_LIMIT, 5000f)
+            
+            // --- Streak Evaluation ---
+            val wasStreakDay = lastSpend <= lastLimit
+            val currentStreak = prefs.getInt(KEY_CURRENT_STREAK, 0)
+            val bestStreak = prefs.getInt(KEY_BEST_STREAK, 0)
+            
+            val newStreak = if (wasStreakDay) currentStreak + 1 else 0
+            val newBest = if (newStreak > bestStreak) newStreak else bestStreak
             
             // --- X-Factor Reset Hook ---
             XFactorManager.onDailyReset(context, lastSpend, lastLimit)
@@ -46,9 +59,12 @@ object TransactionManager {
             prefs.edit()
                 .putString(KEY_LAST_RESET_DATE, today)
                 .putFloat(KEY_TODAY_SPEND, 0f)
-                .putStringSet(KEY_PROCESSED_TXNS, emptySet()) // New day, new transactions
-                .putInt(KEY_OVER_LIMIT_COUNT, 0) // Reset alert counter
+                .putStringSet(KEY_PROCESSED_TXNS, emptySet())
+                .putInt(KEY_OVER_LIMIT_COUNT, 0)
                 .putString(KEY_HISTORY, newHistory)
+                .putInt(KEY_CURRENT_STREAK, newStreak)
+                .putInt(KEY_BEST_STREAK, newBest)
+                .putBoolean(KEY_STREAK_BROKEN_TODAY, !wasStreakDay)
                 .apply()
         } else if (lastDate == "") {
              // First run initialization
@@ -122,6 +138,48 @@ object TransactionManager {
             sum += record.spend
         }
         return sum / history.size
+    }
+
+    // --- Streak Helpers ---
+    fun getCurrentStreak(context: Context): Int {
+        return getPrefs(context).getInt(KEY_CURRENT_STREAK, 0)
+    }
+
+    fun getBestStreak(context: Context): Int {
+        return getPrefs(context).getInt(KEY_BEST_STREAK, 0)
+    }
+
+    fun wasStreakBrokenToday(context: Context): Boolean {
+        return getPrefs(context).getBoolean(KEY_STREAK_BROKEN_TODAY, false)
+    }
+
+    fun getStreakCelebrationMessage(context: Context): String? {
+        val streak = getCurrentStreak(context)
+        val lastCelebrated = getPrefs(context).getInt(KEY_LAST_CELEBRATION, 0)
+        
+        val milestone = when {
+            streak >= 30 && lastCelebrated < 30 -> 30
+            streak >= 14 && lastCelebrated < 14 -> 14
+            streak >= 7 && lastCelebrated < 7 -> 7
+            streak >= 3 && lastCelebrated < 3 -> 3
+            else -> null
+        }
+        
+        if (milestone != null) {
+            getPrefs(context).edit().putInt(KEY_LAST_CELEBRATION, milestone).apply()
+            return when (milestone) {
+                3 -> "Good start! Keep it going."
+                7 -> "🎉 One week of discipline!"
+                14 -> "🔥 Two weeks strong!"
+                30 -> "🏆 Serious control. Well done."
+                else -> null
+            }
+        }
+        return null
+    }
+
+    fun clearStreakBrokenFlag(context: Context) {
+        getPrefs(context).edit().putBoolean(KEY_STREAK_BROKEN_TODAY, false).apply()
     }
 
     // --- Categories ---

@@ -3558,6 +3558,7 @@ id tv_record_status
 id tv_remark
 id tv_spend_amount
 id tv_stat_avg
+id tv_stat_best_streak
 id tv_stat_count
 id tv_stat_left
 id tv_stat_left_label
@@ -3565,6 +3566,7 @@ id tv_stat_max
 id tv_stat_on_track
 id tv_status_battery
 id tv_status_notif
+id tv_streak_badge
 id tv_time
 id tv_tip
 id tv_title_passbook
