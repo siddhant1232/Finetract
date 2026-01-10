@@ -45,6 +45,15 @@ class InsightsFragment : Fragment(R.layout.fragment_insights) {
                 .commit()
         }
 
+        view.findViewById<View>(R.id.btn_latest_report).setOnClickListener {
+            val report = ReportCardManager.generateReport(requireContext())
+            if (report != null) {
+                ReportCardDialogFragment().show(parentFragmentManager, "ReportCard")
+            } else {
+                android.widget.Toast.makeText(requireContext(), "No data for last month's report yet.", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+
         updateUI()
     }
     

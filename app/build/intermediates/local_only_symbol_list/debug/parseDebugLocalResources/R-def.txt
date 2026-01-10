@@ -21,19 +21,23 @@ drawable shape_circle_red
 drawable shape_circle_yellow
 id bottom_navigation
 id btn_back
+id btn_dismiss
 id btn_edit_limit
 id btn_export_csv
 id btn_filter
 id btn_filter_transactions
 id btn_fix_battery
 id btn_fix_notif
+id btn_latest_report
 id btn_next_month
 id btn_open_passbook
 id btn_prev_month
 id card_filter
+id card_ghost_alert
 id container_analytics
 id container_progress
 id container_stats
+id container_subjects
 id et_large_threshold
 id fragment_container
 id header_actions
@@ -48,6 +52,7 @@ id rv_passbook
 id rv_transactions
 id switch_daily_alert
 id tv_amount
+id tv_attendance
 id tv_category
 id tv_current_filter
 id tv_current_limit
@@ -61,6 +66,8 @@ id tv_detail_status
 id tv_empty_state
 id tv_empty_txns
 id tv_filter_label
+id tv_ghost_text
+id tv_grade
 id tv_greeting
 id tv_header_insights
 id tv_limit_info
@@ -71,6 +78,7 @@ id tv_record_date
 id tv_record_limit
 id tv_record_spend
 id tv_record_status
+id tv_remark
 id tv_spend_amount
 id tv_stat_avg
 id tv_stat_count
@@ -81,6 +89,7 @@ id tv_stat_on_track
 id tv_status_battery
 id tv_status_notif
 id tv_time
+id tv_tip
 id tv_title_passbook
 id tv_title_transactions
 id tv_txn_header
@@ -88,6 +97,7 @@ id view_status_dot
 id view_today_bg
 layout activity_main
 layout dialog_day_detail
+layout dialog_report_card
 layout fragment_home
 layout fragment_insights
 layout fragment_passbook

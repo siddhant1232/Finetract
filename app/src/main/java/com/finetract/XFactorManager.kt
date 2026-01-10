@@ -263,5 +263,69 @@ object XFactorManager {
         return MessageInfo(getMoodMessage(context), R.color.success_green, false)
     }
 
+    // --- Master Context Engine (Final Home Upgrade) ---
+    fun getSmartHomeInsight(context: Context): MessageInfo {
+        val spend = TransactionManager.getTodaySpend(context)
+        val limit = TransactionManager.getDailyLimit(context)
+        
+        if (limit == 0f) return MessageInfo("Set a daily limit to simplify your day.", R.color.primary, false)
+        
+        val ratio = spend / limit
+        val remaining = limit - spend
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) // 0-23
+        
+        // 1. LIMIT CROSSED (Highest Priority)
+        if (spend > limit) {
+             return MessageInfo("You went beyond today’s plan.", R.color.danger_red, true)
+        }
+        
+        // 2. INACTIVITY (Start of Day)
+        if (spend == 0f) {
+            return if (hour >= 18) MessageInfo("No spending today? Impressive!", R.color.success_green, false)
+            else MessageInfo("No spends yet today. Good start.", R.color.success_green, false)
+        }
+
+        // 3. TIME-AWARE CONTEXT (Warnings)
+        // Morning (<12 PM) and heavy usage
+        if (hour < 12 && ratio > 0.4f) {
+             return MessageInfo("Pace yourself, it's still early.", R.color.warning_yellow, false)
+        }
+        // Afternoon (12-5 PM) and nearly done
+        if (hour in 12..17 && ratio > 0.8f) {
+             return MessageInfo("You’ve used most of today’s budget.", R.color.warning_yellow, false)
+        }
+        
+        // 4. RISK HIGHLIGHT (Dominant Category)
+        val stats = TransactionManager.getTodayStats(context)
+        if (stats.maxAmount > (spend * 0.5f) && stats.count > 1) {
+             // If one single category/txn is >50% of total
+             return MessageInfo("Today’s risk: ${stats.maxCategory} is highest.", R.color.primary, false)
+        }
+        if (stats.count > 8) {
+             return MessageInfo("Many small spends can add up quickly.", R.color.warning_yellow, false)
+        }
+
+        // 5. MICRO COMPARISON (Average / Yesterday)
+        // Only show if meaningful deviation? Or randomly to keep it fresh.
+        val avg = TransactionManager.getDailyAverage(context)
+        val yesterday = TransactionManager.getYesterdaySpend(context)
+        
+        if (yesterday > 0 && spend < yesterday && hour > 18) {
+             return MessageInfo("Spending less than yesterday. Nice.", R.color.success_green, false)
+        }
+        if (avg > 0 && spend > avg * 1.2f) {
+             return MessageInfo("Slightly higher than your average.", R.color.warning_yellow, false)
+        }
+        
+        // 6. POSITIVE / DEFAULT
+        // Evening & Safe
+        if (hour >= 18 && ratio < 0.8f) {
+             return MessageInfo("You’re doing well for this time of day.", R.color.success_green, false)
+        }
+        
+        // Default Safe
+        return MessageInfo("You still have ₹${remaining.toInt()} to spend today.", R.color.success_green, false)
+    }
+
     data class MessageInfo(val text: String, val colorRes: Int, val isAlert: Boolean)
 }

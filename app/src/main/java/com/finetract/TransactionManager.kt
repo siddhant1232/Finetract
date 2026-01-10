@@ -97,6 +97,33 @@ object TransactionManager {
         getPrefs(context).edit().putFloat(KEY_LARGE_PAYMENT_THRESHOLD, threshold).apply()
     }
 
+    private const val KEY_IS_PRIVACY_MODE = "is_privacy_mode"
+
+    fun isPrivacyMode(context: Context): Boolean {
+        return getPrefs(context).getBoolean(KEY_IS_PRIVACY_MODE, false)
+    }
+
+    fun setPrivacyMode(context: Context, isPrivate: Boolean) {
+        getPrefs(context).edit().putBoolean(KEY_IS_PRIVACY_MODE, isPrivate).apply()
+    }
+
+    // --- Intelligence Helpers ---
+    fun getYesterdaySpend(context: Context): Float {
+        val history = getHistory(context)
+        if (history.isEmpty()) return 0f
+        return history.last().spend
+    }
+
+    fun getDailyAverage(context: Context): Float {
+        val history = getHistory(context)
+        if (history.isEmpty()) return 0f
+        var sum = 0f
+        for (record in history) {
+            sum += record.spend
+        }
+        return sum / history.size
+    }
+
     // --- Categories ---
     object Category {
         const val FOOD = "Food"

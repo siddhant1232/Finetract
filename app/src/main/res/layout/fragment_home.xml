@@ -14,8 +14,8 @@
         android:layout_height="wrap_content"
         tools:text="Good Morning!"
         android:textColor="@color/text_primary"
-        android:textSize="28sp"
-        android:textStyle="bold"
+        android:textSize="32sp"
+        android:fontFamily="sans-serif-condensed-medium"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -25,7 +25,8 @@
         android:layout_height="wrap_content"
         tools:text="Jan 12, Sunday"
         android:textColor="@color/text_secondary"
-        android:textSize="14sp"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-condensed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_greeting"/>
 
@@ -34,9 +35,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_pill_accent"
-        android:backgroundTint="#E1F5FE"
-        android:paddingHorizontal="10dp"
-        android:paddingVertical="4dp"
+        android:backgroundTint="#F5F5F5"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="6dp"
         android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/tv_greeting"
@@ -45,8 +46,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🔒 PRIVATE"
-            android:textColor="@color/primary_dark"
+            android:text="MY SAFE SPACE"
+            android:textColor="@color/text_secondary"
             android:textSize="10sp"
             android:textStyle="bold"
             android:letterSpacing="0.05"/>
@@ -105,9 +106,8 @@
                 android:layout_height="wrap_content"
                 tools:text="₹420"
                 android:textColor="@color/text_primary"
-                android:textSize="36sp"
-                android:textStyle="bold"
-                android:fontFamily="sans-serif-medium"/>
+                android:textSize="42sp"
+                android:fontFamily="sans-serif-condensed-medium"/>
 
             <TextView
                 android:id="@+id/tv_limit_info"
@@ -128,12 +128,54 @@
         android:layout_marginTop="16dp"
         tools:text="You’re doing great today!"
         android:textColor="@color/text_primary"
-        android:textSize="16sp"
+        android:textSize="18sp"
         android:textAlignment="center"
-        android:fontFamily="sans-serif-medium"
+        android:fontFamily="sans-serif-condensed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/container_progress"/>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_ghost_alert"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="#FFCDD2"
+        app:cardBackgroundColor="#FFEBEE"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/tv_daily_insight"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintWidth_percent="0.9">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@android:drawable/stat_notify_error"
+                app:tint="#D32F2F" />
+
+            <TextView
+                android:id="@+id/tv_ghost_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Detected: Netflix ₹199"
+                android:textColor="#C62828"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-condensed"/>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <!-- 4. Dashboard Stats Grid -->
     <LinearLayout
