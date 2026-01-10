@@ -2915,6 +2915,7 @@ drawable abc_textfield_search_material
 drawable abc_vector_test
 drawable avd_hide_password
 drawable avd_show_password
+drawable bg_pill_accent
 drawable btn_checkbox_checked_mtrl
 drawable btn_checkbox_checked_to_unchecked_mtrl_animation
 drawable btn_checkbox_unchecked_mtrl
@@ -3138,7 +3139,6 @@ id cache_measures
 id callMeasure
 id cancel_button
 id card_filter
-id card_glance
 id carryVelocity
 id center
 id centerCrop
@@ -3163,9 +3163,8 @@ id confirm_button
 id constraint
 id container
 id container_analytics
-id container_glance_highest
 id container_progress
-id container_secure
+id container_stats
 id content
 id contentPanel
 id contiguous
@@ -3530,6 +3529,7 @@ id tv_category
 id tv_current_filter
 id tv_current_limit
 id tv_daily_insight
+id tv_date
 id tv_day_number
 id tv_detail_date
 id tv_detail_limit
@@ -3538,9 +3538,7 @@ id tv_detail_status
 id tv_empty_state
 id tv_empty_txns
 id tv_filter_label
-id tv_glance_highest
-id tv_glance_remaining
-id tv_glance_txns
+id tv_greeting
 id tv_header_insights
 id tv_limit_info
 id tv_merchant
@@ -3552,6 +3550,10 @@ id tv_record_spend
 id tv_record_status
 id tv_spend_amount
 id tv_stat_avg
+id tv_stat_count
+id tv_stat_left
+id tv_stat_left_label
+id tv_stat_max
 id tv_stat_on_track
 id tv_status_battery
 id tv_status_notif

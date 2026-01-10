@@ -7,78 +7,88 @@
     android:background="@color/background_page"
     android:padding="24dp">
 
-    <!-- Trust/Secure Badge -->
-    <LinearLayout
-        android:id="@+id/container_secure"
+    <!-- 1. Smart Greeting Header -->
+    <TextView
+        android:id="@+id/tv_greeting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="#E1F5FE"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="6dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="Good Morning!"
+        android:textColor="@color/text_primary"
+        android:textSize="28sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/tv_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Jan 12, Sunday"
+        android:textColor="@color/text_secondary"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_greeting"/>
+
+    <!-- Trust Badge (Moved to Top Right) -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_pill_accent"
+        android:backgroundTint="#E1F5FE"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="4dp"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_greeting"
+        app:layout_constraintBottom_toBottomOf="@id/tv_date">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🔒"
-            android:textSize="12sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:text="@string/secure_label"
+            android:text="🔒 PRIVATE"
             android:textColor="@color/primary_dark"
-            android:textSize="12sp"
+            android:textSize="10sp"
             android:textStyle="bold"
-            android:textAllCaps="true"
             android:letterSpacing="0.05"/>
     </LinearLayout>
 
-    <!-- Main Circular Progress Container -->
+    <!-- 2. Main Circular Progress -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/container_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="32dp"
         android:background="?attr/selectableItemBackground"
         android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/container_secure">
+        app:layout_constraintTop_toBottomOf="@id/tv_date">
 
-        <!-- Background Circle (Gray track) -->
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/progress_background"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:trackThickness="16dp"
-            app:indicatorSize="220dp"
-            app:trackColor="#E0E0E0"
-            app:indicatorColor="#E0E0E0"
+            app:trackThickness="18dp"
+            app:indicatorSize="200dp"
+            app:trackColor="#F5F5F5"
+            app:indicatorColor="#F5F5F5"
             android:progress="100"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Actual Progress -->
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/progress_limit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:trackThickness="16dp"
-            app:indicatorSize="220dp"
+            app:trackThickness="18dp"
+            app:indicatorSize="200dp"
             app:trackColor="@android:color/transparent"
             app:indicatorColor="@color/success_green"
-            app:trackCornerRadius="8dp"
+            app:trackCornerRadius="9dp"
             android:progress="50"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Centered Text -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -93,126 +103,154 @@
                 android:id="@+id/tv_spend_amount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="₹0"
+                tools:text="₹420"
                 android:textColor="@color/text_primary"
-                android:textSize="40sp"
-                android:textStyle="bold" />
+                android:textSize="36sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"/>
 
             <TextView
                 android:id="@+id/tv_limit_info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="of ₹0"
+                android:layout_marginTop="2dp"
+                tools:text="of ₹2,000"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 1. Daily Insight Line -->
+    <!-- 3. Daily Insight -->
     <TextView
         android:id="@+id/tv_daily_insight"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="You’re well within your limit today."
+        android:layout_marginTop="16dp"
+        tools:text="You’re doing great today!"
         android:textColor="@color/text_primary"
         android:textSize="16sp"
-        android:textStyle="bold"
         android:textAlignment="center"
-        app:layout_constraintTop_toBottomOf="@id/container_progress"
+        android:fontFamily="sans-serif-medium"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/container_progress"/>
 
-    <!-- 2. Today at a Glance Card -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_glance"
+    <!-- 4. Dashboard Stats Grid -->
+    <LinearLayout
+        android:id="@+id/container_stats"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginHorizontal="16dp"
-        app:cardBackgroundColor="@color/surface_card"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="2dp"
-        app:strokeWidth="1dp"
-        app:strokeColor="#EEF0F2"
+        android:orientation="horizontal"
+        android:layout_marginTop="32dp"
+        android:weightSum="3"
+        android:baselineAligned="false"
         app:layout_constraintTop_toBottomOf="@id/tv_daily_insight">
 
+        <!-- Stat 1: Count -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="vertical"
-            android:padding="20dp">
-
+            android:gravity="center">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Today at a glance"
+                android:text="🧾"
+                android:textSize="20sp"/>
+            <TextView
+                android:id="@+id/tv_stat_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="4"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Txns"
                 android:textColor="@color/text_secondary"
-                android:textSize="12sp"
-                android:textAllCaps="true"
-                android:letterSpacing="0.05"
-                android:layout_marginBottom="12dp"/>
-
-            <!-- Item 1: Transactions -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="8dp">
-                <TextView
-                    android:id="@+id/tv_glance_txns"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="• 0 transactions today"
-                    android:textColor="@color/text_primary"
-                    android:textSize="15sp"/>
-            </LinearLayout>
-
-            <!-- Item 2: Highest Spend -->
-            <LinearLayout
-                android:id="@+id/container_glance_highest"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="8dp">
-                <TextView
-                    android:id="@+id/tv_glance_highest"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="• Highest: ₹0 (None)"
-                    android:textColor="@color/text_primary"
-                    android:textSize="15sp"/>
-            </LinearLayout>
-
-            <!-- Item 3: Remaining -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical">
-                <TextView
-                    android:id="@+id/tv_glance_remaining"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="• Remaining: ₹0"
-                    android:textColor="@color/text_primary"
-                    android:textSize="15sp"/>
-            </LinearLayout>
-
+                android:textSize="12sp"/>
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
 
-    <!-- 3. Behavioral Nudge (X-Factor) -->
+        <!-- Stat 2: Highest -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔥"
+                android:textSize="20sp"/>
+            <TextView
+                android:id="@+id/tv_stat_max"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="₹120"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Highest"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
+        <!-- Stat 3: Left -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="💰"
+                android:textSize="20sp"/>
+            <TextView
+                android:id="@+id/tv_stat_left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="₹500"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp"/>
+            <TextView
+                android:id="@+id/tv_stat_left_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Left"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 5. Behavioral Nudge (Bottom Pill) -->
     <TextView
         android:id="@+id/tv_nudge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Great control so far 👏"
-        android:textColor="@color/text_secondary"
+        tools:text="✨ Great control so far!"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:background="@drawable/bg_pill_accent"
+        android:backgroundTint="#F1F8E9"
+        android:textColor="@color/success_green"
         android:textSize="13sp"
-        android:layout_marginBottom="32dp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="16dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

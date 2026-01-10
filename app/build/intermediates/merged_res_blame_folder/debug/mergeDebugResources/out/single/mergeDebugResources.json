@@ -74,5 +74,9 @@
     {
         "merged": "com.finetract.app-debug-37:/layout_fragment_home.xml.flat",
         "source": "com.finetract.app-main-39:/layout/fragment_home.xml"
+    },
+    {
+        "merged": "com.finetract.app-debug-37:/drawable_bg_pill_accent.xml.flat",
+        "source": "com.finetract.app-main-39:/drawable/bg_pill_accent.xml"
     }
 ]

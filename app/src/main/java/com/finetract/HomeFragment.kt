@@ -25,11 +25,23 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         val limit = TransactionManager.getDailyLimit(context)
         val remaining = limit - spend
         
-        // 1. Progress & Daily Insight
+        // --- 1. Smart Header ---
+        val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
+        val greeting = when (hour) {
+            in 5..11 -> "Good Morning! ☀️"
+            in 12..16 -> "Good Afternoon! 🎓"
+            in 17..22 -> "Good Evening! 🌙"
+            else -> "Late Night Grind? 🦉"
+        }
+        view?.findViewById<TextView>(R.id.tv_greeting)?.text = greeting
+        
+        val dateStr = java.text.SimpleDateFormat("MMM d, EEEE", java.util.Locale.getDefault()).format(java.util.Date())
+        view?.findViewById<TextView>(R.id.tv_date)?.text = dateStr
+
+        // --- 2. Main Progress ---
         val progress = if (limit > 0) ((spend / limit) * 100).toInt() else 0
         val ratio = if (limit > 0) spend / limit else 0f
         
-        // Color Logic
         val colorRes = when {
             spend > limit -> R.color.danger_red
             progress >= 90 -> R.color.warning_yellow
@@ -37,56 +49,94 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
         val statusColor = ContextCompat.getColor(context, colorRes)
 
-        // Bind Main Progress
         view?.findViewById<TextView>(R.id.tv_spend_amount)?.text = "₹${spend.toInt()}"
-        view?.findViewById<TextView>(R.id.tv_limit_info)?.text = getString(R.string.label_spent_of) + " ₹${limit.toInt()}"
+        view?.findViewById<TextView>(R.id.tv_limit_info)?.text = "of ₹${limit.toInt()}"
         
         val progressBar = view?.findViewById<com.google.android.material.progressindicator.CircularProgressIndicator>(R.id.progress_limit)
-        
-        // Animation: Smooth Progress
         val animator = android.animation.ObjectAnimator.ofInt(progressBar, "progress", progressBar?.progress ?: 0, progress.coerceIn(0, 100))
-        animator.duration = 800 // Smooth transition
+        animator.duration = 800
         animator.interpolator = android.view.animation.DecelerateInterpolator()
         animator.start()
-        
         progressBar?.setIndicatorColor(statusColor)
 
-        // Bind Daily Insight (Mandatory)
+        // --- 3. Daily Insight ---
         val tvInsight = view?.findViewById<TextView>(R.id.tv_daily_insight)
         tvInsight?.text = when {
-            ratio <= 0.6f -> "You’re well within your limit today."
-            ratio <= 0.9f -> "You’re getting close to today’s limit."
-            else -> "You’ve crossed today’s limit."
+            ratio <= 0.6f -> "You’re well within your limit."
+            ratio <= 0.9f -> "Careful, you're getting close."
+            else -> "You’ve crossed your limit."
         }
         tvInsight?.setTextColor(statusColor)
-        
-        // 2. Today at a Glance
-        val stats = TransactionManager.getTodayStats(context)
-        view?.findViewById<TextView>(R.id.tv_glance_txns)?.text = "• ${stats.count} transactions today"
-        
-        val maxText = if (stats.maxAmount > 0) "• Highest: ₹${stats.maxAmount.toInt()} (${stats.maxCategory})" else "• Highest: -"
-        view?.findViewById<TextView>(R.id.tv_glance_highest)?.text = maxText
-        
-        view?.findViewById<TextView>(R.id.tv_glance_remaining)?.text = "• Remaining: ₹${remaining.toInt()}"
 
-        // 3. Behavioral Nudge (X-Factor / Contextual)
+        // --- 4. Dashboard Grid Stats ---
+        val stats = TransactionManager.getTodayStats(context)
+        
+        // Count
+        view?.findViewById<TextView>(R.id.tv_stat_count)?.text = "${stats.count}"
+        
+        // Highest
+        val maxText = if (stats.maxAmount > 0) "₹${stats.maxAmount.toInt()}" else "-"
+        view?.findViewById<TextView>(R.id.tv_stat_max)?.text = maxText
+        
+        // Left
+        val tvLeft = view?.findViewById<TextView>(R.id.tv_stat_left)
+        val tvLeftLabel = view?.findViewById<TextView>(R.id.tv_stat_left_label)
+        
+        if (remaining < 0) {
+            tvLeft?.text = "-₹${kotlin.math.abs(remaining.toInt())}"
+            tvLeft?.setTextColor(ContextCompat.getColor(context, R.color.danger_red))
+            tvLeftLabel?.text = "Over"
+            tvLeftLabel?.setTextColor(ContextCompat.getColor(context, R.color.danger_red))
+        } else {
+            tvLeft?.text = "₹${remaining.toInt()}"
+            tvLeft?.setTextColor(ContextCompat.getColor(context, R.color.text_primary))
+            tvLeftLabel?.text = "Left"
+            tvLeftLabel?.setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
+        }
+
+        // --- 5. Behavioral Nudge (Styled Pill) ---
         val tvNudge = view?.findViewById<TextView>(R.id.tv_nudge)
         
-        // Simple Logic for Nudge as requested
         val nudgeText = when {
-            // Priority: Weekend -> Near Limit -> Under Limit
             XFactorManager.getWeekendWarning(context) != null -> XFactorManager.getWeekendWarning(context)
-            ratio > 0.8f && ratio <= 1.0f -> "Consider slowing down for the rest of the day."
-            else -> "Great control so far 👏" // Default positive reinforcement
+            ratio > 0.8f && ratio <= 1.0f -> "⚠️ Slow down for today"
+            else -> "✨ Great control so far!"
         }
         tvNudge?.text = nudgeText
         
-        // Add Click Listener to open Analytics
+        // Dynamic Pill Color
+        val pillColor = when {
+            ratio > 0.9f -> "#FFEBEE" // Red tint
+            progress >= 90 -> "#FFFDE7" // Yellow tint
+            else -> "#F1F8E9" // Green tint
+        }
+        val pillText = when {
+            ratio > 0.9f -> R.color.danger_red
+            progress >= 90 -> R.color.warning_yellow // Actually text might need darker yellow/orange
+            else -> R.color.success_green
+        }
+        
+        tvNudge?.backgroundTintList = ColorStateList.valueOf(android.graphics.Color.parseColor(pillColor))
+        tvNudge?.setTextColor(ContextCompat.getColor(context, if (progress >= 90 && ratio <= 1.0f) R.color.text_primary else pillText)) // Fallback for yellow readability
+
+        // --- Click Action ---
         view?.findViewById<View>(R.id.container_progress)?.setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, InsightsFragment())
                 .addToBackStack(null)
                 .commit()
         }
+        
+        // --- Entry Animation (Subtle Stagger) ---
+        val grid = view?.findViewById<View>(R.id.container_stats)
+        val nudge = view?.findViewById<View>(R.id.tv_nudge)
+        
+        grid?.alpha = 0f
+        grid?.translationY = 20f
+        grid?.animate()?.alpha(1f)?.translationY(0f)?.setDuration(500)?.setStartDelay(100)?.start()
+        
+        nudge?.alpha = 0f
+        nudge?.translationY = 20f
+        nudge?.animate()?.alpha(1f)?.translationY(0f)?.setDuration(500)?.setStartDelay(200)?.start()
     }
 }
