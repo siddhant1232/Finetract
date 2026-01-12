@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.finetract.app-mergeDebugResources-35:/values-w320dp-land-v13/values-w320dp-land-v13.xml",
+            "outputFile": "com.finetract.app-mergeDebugResources-68:/values-w320dp-land-v13/values-w320dp-land-v13.xml",
             "map": [
                 {
-                    "source": "/Users/apple/.gradle/caches/8.10.2/transforms/2452517046d9f64093f5050250c11b7b/transformed/material-1.9.0/res/values-w320dp-land-v13/values-w320dp-land-v13.xml",
+                    "source": "C:\\Users\\Rohit\\.gradle\\caches\\8.10.2\\transforms\\1b377e3fa0a9c7c802729be15b649fc2\\transformed\\material-1.10.0\\res\\values-w320dp-land-v13\\values-w320dp-land-v13.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",

@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.finetract.app-mergeDebugResources-35:/values-v22/values-v22.xml",
+            "outputFile": "com.finetract.app-mergeDebugResources-68:/values-v22/values-v22.xml",
             "map": [
                 {
-                    "source": "/Users/apple/.gradle/caches/8.10.2/transforms/e1cea218e74a4044b396288e7d4fed6c/transformed/appcompat-1.6.1/res/values-v22/values-v22.xml",
+                    "source": "C:\\Users\\Rohit\\.gradle\\caches\\8.10.2\\transforms\\68174435a58d27a8da3e45a177251067\\transformed\\appcompat-1.6.1\\res\\values-v22\\values-v22.xml",
                     "from": {
                         "startLines": "2,3,4,9",
                         "startColumns": "4,4,4,4",
