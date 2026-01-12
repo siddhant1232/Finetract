@@ -1,8 +1,11 @@
 package com.finetract
 
+import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -51,6 +54,16 @@ fun MainApp(viewModel: MainViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showAddTransactionDialog by remember { mutableStateOf(false) }
+
+    val smsPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { _ -> }
+
+    LaunchedEffect(Unit) {
+        smsPermissionLauncher.launch(
+            arrayOf(Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS)
+        )
+    }
 
     val items = listOf(
         Screen.Home,
@@ -101,11 +114,11 @@ fun MainApp(viewModel: MainViewModel = hiltViewModel()) {
             startDestination = Screen.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(Screen.Home.route) { HomeScreen(uiState) }
+            composable(Screen.Home.route) { HomeScreen(uiState, viewModel) }
             composable(Screen.Analysis.route) { AnalysisScreen(uiState) }
             composable(Screen.Transactions.route) { TransactionsScreen(uiState) }
             composable(Screen.Wallet.route) { WalletScreen(uiState, viewModel) }
-            composable(Screen.Profile.route) { ProfileScreen(viewModel) }
+            composable(Screen.Profile.route) { ProfileScreen(uiState, viewModel) }
         }
     }
 
@@ -173,8 +186,6 @@ fun AddTransactionDialog(
                             Text(category.name)
                         }
                     }
-                } else {
-                    Text("No categories found. Add one in Wallet tab.", color = MaterialTheme.colorScheme.error)
                 }
             }
         },
@@ -182,11 +193,11 @@ fun AddTransactionDialog(
             TextButton(
                 onClick = {
                     val amountVal = amount.toDoubleOrNull() ?: 0.0
-                    if (amountVal > 0 && (categories.isEmpty() || selectedCategoryId != 0L)) {
+                    if (amountVal > 0) {
                         onConfirm(amountVal, selectedCategoryId, note, type)
                     }
                 },
-                enabled = amount.isNotEmpty() && (categories.isNotEmpty() || type == TransactionType.INCOME)
+                enabled = amount.isNotEmpty()
             ) {
                 Text("Add")
             }

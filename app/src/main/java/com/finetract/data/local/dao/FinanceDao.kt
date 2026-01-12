@@ -20,7 +20,6 @@ data class DailyTotal(
 
 @Dao
 interface FinanceDao {
-    // Transactions
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTransaction(transaction: Transaction)
 
@@ -28,10 +27,16 @@ interface FinanceDao {
     fun getAllTransactions(): Flow<List<Transaction>>
 
     @Query("""
-        SELECT SUM(amount) FROM transactions 
+        SELECT MAX(0.0, TOTAL(amount)) FROM transactions 
         WHERE type = :type AND strftime('%m-%Y', timestamp / 1000, 'unixepoch') = :monthYear
     """)
-    fun getMonthlyTotal(type: TransactionType, monthYear: String): Flow<Double?>
+    fun getMonthlyTotal(type: TransactionType, monthYear: String): Flow<Double>
+
+    @Query("""
+        SELECT MAX(0.0, TOTAL(amount)) FROM transactions 
+        WHERE type = 'EXPENSE' AND strftime('%Y-%m-%d', timestamp / 1000, 'unixepoch') = :date
+    """)
+    fun getDailyExpenditure(date: String): Flow<Double>
 
     @Query("""
         SELECT categoryId, name as categoryName, SUM(amount) as totalAmount 
@@ -45,13 +50,21 @@ interface FinanceDao {
     @Query("""
         SELECT strftime('%Y-%m-%d', timestamp / 1000, 'unixepoch') as date, SUM(amount) as totalAmount
         FROM transactions
+        WHERE type = 'EXPENSE'
+        GROUP BY date
+        ORDER BY date ASC
+    """)
+    fun getAllDailyTotals(): Flow<List<DailyTotal>>
+
+    @Query("""
+        SELECT strftime('%Y-%m-%d', timestamp / 1000, 'unixepoch') as date, SUM(amount) as totalAmount
+        FROM transactions
         WHERE type = 'EXPENSE' AND strftime('%m-%Y', timestamp / 1000, 'unixepoch') = :monthYear
         GROUP BY date
         ORDER BY date ASC
     """)
     fun getDailyTotalsByMonth(monthYear: String): Flow<List<DailyTotal>>
 
-    // Categories
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCategory(category: Category)
 
@@ -61,7 +74,6 @@ interface FinanceDao {
     @Query("DELETE FROM categories WHERE id = :id")
     suspend fun deleteCategory(id: Long)
 
-    // Budgets
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBudget(budget: Budget)
 

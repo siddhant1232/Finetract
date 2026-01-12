@@ -20,11 +20,18 @@ data class UiState(
     val categories: List<Category> = emptyList(),
     val monthlyIncome: Double = 0.0,
     val monthlyExpense: Double = 0.0,
+    val dailyExpenditure: Double = 0.0,
+    val dailyLimit: Double = 500.0,
     val categoryTotals: List<com.finetract.data.local.dao.CategoryTotal> = emptyList(),
     val dailyTotals: List<com.finetract.data.local.dao.DailyTotal> = emptyList(),
     val budgets: List<Budget> = emptyList(),
-    val currentMonthYear: String = ""
+    val currentMonthYear: String = "",
+    val smoothedTrend: List<Double> = emptyList()
 )
+
+sealed class UiEffect {
+    object ShowOverLimitPopup : UiEffect()
+}
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -33,26 +40,54 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _currentMonthYear = MutableStateFlow(getCurrentMonthYear())
-    
+    private val _currentDate = MutableStateFlow(getCurrentDate())
+
+    private val _uiEffect = MutableSharedFlow<UiEffect>()
+    val uiEffect = _uiEffect.asSharedFlow()
+
+    private var hasShownLimitAlertToday = false
+
     val uiState: StateFlow<UiState> = combine(
         repository.getAllTransactions(),
         repository.getAllCategories(),
         _currentMonthYear.flatMapLatest { repository.getMonthlyTotal(TransactionType.INCOME, it) },
         _currentMonthYear.flatMapLatest { repository.getMonthlyTotal(TransactionType.EXPENSE, it) },
+        _currentDate.flatMapLatest { repository.getDailyExpenditure(it) },
+        repository.dailyLimit,
         _currentMonthYear.flatMapLatest { repository.getCategoryTotalsByMonth(it) },
-        _currentMonthYear.flatMapLatest { repository.getDailyTotalsByMonth(it) },
+        repository.getAllDailyTotals(),
         _currentMonthYear.flatMapLatest { repository.getBudgetsByMonth(it) },
         _currentMonthYear
     ) { args: Array<Any?> ->
+        val dailyExp = args[4] as? Double ?: 0.0
+        val limit = args[5] as? Double ?: 500.0
+        val dailyTotals = args[7] as List<com.finetract.data.local.dao.DailyTotal>
+
+        // Algorithm: Simple Moving Average (7-day window) for smoothing
+        val windowSize = 7
+        val smoothed = dailyTotals.map { it.totalAmount }
+            .windowed(windowSize, 1, true) { it.average() }
+
+        // Trigger Alert Logic
+        if (dailyExp > limit && !hasShownLimitAlertToday) {
+            hasShownLimitAlertToday = true
+            _uiEffect.emit(UiEffect.ShowOverLimitPopup)
+        } else if (dailyExp <= limit) {
+            hasShownLimitAlertToday = false
+        }
+        
         UiState(
             transactions = args[0] as List<Transaction>,
             categories = args[1] as List<Category>,
             monthlyIncome = args[2] as? Double ?: 0.0,
             monthlyExpense = args[3] as? Double ?: 0.0,
-            categoryTotals = args[4] as List<com.finetract.data.local.dao.CategoryTotal>,
-            dailyTotals = args[5] as List<com.finetract.data.local.dao.DailyTotal>,
-            budgets = args[6] as List<Budget>,
-            currentMonthYear = args[7] as String
+            dailyExpenditure = dailyExp,
+            dailyLimit = limit,
+            categoryTotals = args[6] as List<com.finetract.data.local.dao.CategoryTotal>,
+            dailyTotals = dailyTotals,
+            budgets = args[8] as List<Budget>,
+            currentMonthYear = args[9] as String,
+            smoothedTrend = smoothed
         )
     }.stateIn(
         scope = viewModelScope,
@@ -62,6 +97,10 @@ class MainViewModel @Inject constructor(
 
     private fun getCurrentMonthYear(): String {
         return SimpleDateFormat("MM-yyyy", Locale.getDefault()).format(Date())
+    }
+
+    private fun getCurrentDate(): String {
+        return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
     }
 
     fun addTransaction(amount: Double, categoryId: Long, note: String, type: TransactionType) {
@@ -75,6 +114,12 @@ class MainViewModel @Inject constructor(
                     type = type
                 )
             )
+        }
+    }
+
+    fun updateDailyLimit(limit: Double) {
+        viewModelScope.launch {
+            repository.setDailyLimit(limit)
         }
     }
 

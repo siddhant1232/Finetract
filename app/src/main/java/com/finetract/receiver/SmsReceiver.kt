@@ -15,6 +15,7 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class SmsReceiver : BroadcastReceiver() {
@@ -37,9 +38,6 @@ class SmsReceiver : BroadcastReceiver() {
             
             Log.d("SmsReceiver", "Received SMS from $sender: $body")
 
-            // Optional: Filter by bank short-codes (e.g., starts with "AD-" or ends with "-SBI")
-            // if (!sender.contains("SBI", ignoreCase = true)) continue
-
             val parsed = SmsParser.parse(body)
             if (parsed != null && !parsed.isPending) {
                 saveTransaction(context, parsed.amount, parsed.type, "${parsed.vendor} (SMS)")
@@ -56,11 +54,9 @@ class SmsReceiver : BroadcastReceiver() {
 
         scope.launch {
             try {
-                // For SMS transactions, we'll use a default "Uncategorized" category if it exists, 
-                // or just the first available category for now. 
-                // In a real app, we'd map vendor to category or ask the user.
-                val categories = repository.getAllCategories().firstOrNull()
-                val categoryId = categories?.firstOrNull()?.id ?: 1L // Fallback to ID 1
+                // Fetch first category or default
+                val categories = repository.getAllCategories().first()
+                val categoryId = categories.firstOrNull()?.id ?: 1L
 
                 repository.insertTransaction(
                     Transaction(

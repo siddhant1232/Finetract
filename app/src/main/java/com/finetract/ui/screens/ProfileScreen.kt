@@ -9,10 +9,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.finetract.ui.MainViewModel
+import com.finetract.ui.UiState
 
 @Composable
-fun ProfileScreen(viewModel: MainViewModel) {
+fun ProfileScreen(uiState: UiState, viewModel: MainViewModel) {
     var showDeleteConfirm by remember { mutableStateOf(false) }
+    var showLimitEdit by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -21,17 +23,37 @@ fun ProfileScreen(viewModel: MainViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("Profile & Settings", style = MaterialTheme.typography.headlineMedium)
+        Text("Settings & Limits", style = MaterialTheme.typography.headlineMedium)
         
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         
         OutlinedCard(
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("Account Info", style = MaterialTheme.typography.titleMedium)
-                Text("App Version: 1.0.0", style = MaterialTheme.typography.bodyMedium)
-                Text("Mode: 100% Offline", style = MaterialTheme.typography.bodyMedium)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text("Daily Spending Limit", style = MaterialTheme.typography.titleMedium)
+                        Text("₹${uiState.dailyLimit}", style = MaterialTheme.typography.headlineSmall)
+                    }
+                    Button(onClick = { showLimitEdit = true }) {
+                        Text("Edit")
+                    }
+                }
+            }
+        }
+
+        OutlinedCard(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("App Information", style = MaterialTheme.typography.titleMedium)
+                Text("Version: 2.0.0 (Algorithmic Edition)", style = MaterialTheme.typography.bodyMedium)
+                Text("Engine: Constraint-Driven Expenditure Tracker", style = MaterialTheme.typography.bodyMedium)
             }
         }
 
@@ -44,6 +66,36 @@ fun ProfileScreen(viewModel: MainViewModel) {
         ) {
             Text("Reset All Data")
         }
+    }
+
+    if (showLimitEdit) {
+        var limitInput by remember { mutableStateOf(uiState.dailyLimit.toString()) }
+        AlertDialog(
+            onDismissRequest = { showLimitEdit = false },
+            title = { Text("Set Daily Limit") },
+            text = {
+                TextField(
+                    value = limitInput,
+                    onValueChange = { limitInput = it },
+                    label = { Text("Daily Threshold (₹)") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    val newLimit = limitInput.toDoubleOrNull() ?: uiState.dailyLimit
+                    viewModel.updateDailyLimit(newLimit)
+                    showLimitEdit = false
+                }) {
+                    Text("Save")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showLimitEdit = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 
     if (showDeleteConfirm) {

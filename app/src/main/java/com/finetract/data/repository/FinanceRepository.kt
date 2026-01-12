@@ -1,6 +1,7 @@
 package com.finetract.data.repository
 
 import com.finetract.data.local.dao.FinanceDao
+import com.finetract.data.local.datastore.SettingsManager
 import com.finetract.data.local.entities.Budget
 import com.finetract.data.local.entities.Category
 import com.finetract.data.local.entities.Transaction
@@ -11,12 +12,16 @@ import javax.inject.Singleton
 
 @Singleton
 class FinanceRepository @Inject constructor(
-    private val financeDao: FinanceDao
+    private val financeDao: FinanceDao,
+    private val settingsManager: SettingsManager
 ) {
     fun getAllTransactions() = financeDao.getAllTransactions()
     
     fun getMonthlyTotal(type: TransactionType, monthYear: String) = 
         financeDao.getMonthlyTotal(type, monthYear)
+    
+    fun getDailyExpenditure(date: String) = 
+        financeDao.getDailyExpenditure(date)
     
     fun getCategoryTotalsByMonth(monthYear: String) = 
         financeDao.getCategoryTotalsByMonth(monthYear)
@@ -24,10 +29,16 @@ class FinanceRepository @Inject constructor(
     fun getDailyTotalsByMonth(monthYear: String) = 
         financeDao.getDailyTotalsByMonth(monthYear)
 
+    fun getAllDailyTotals() = financeDao.getAllDailyTotals()
+
     fun getAllCategories() = financeDao.getAllCategories()
     
     fun getBudgetsByMonth(monthYear: String) = 
         financeDao.getBudgetsByMonth(monthYear)
+
+    val dailyLimit = settingsManager.dailyLimit
+
+    suspend fun setDailyLimit(limit: Double) = settingsManager.setDailyLimit(limit)
 
     suspend fun insertTransaction(transaction: Transaction) = 
         financeDao.insertTransaction(transaction)

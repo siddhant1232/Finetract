@@ -20,32 +20,27 @@ object SmsParser {
     private val FRM_U_REGEX = "(?i)frm u on ([\\s\\w]+?)(?: on|\\.|$)".toRegex()
 
     fun parse(message: String): ParsedTransaction? {
-        // Filter for specific account if needed, but here we prioritize pattern matching
-        
         // Expense Check
-        val debitMatch = DEBIT_REGEX.find(message)
-        if (debitMatch != null) {
-            val amount = debitMatch.groupValues[1].replace(",", "").toDoubleOrNull() ?: 0.0
+        DEBIT_REGEX.find(message)?.let { match ->
+            val amount = match.groupValues.getOrNull(1)?.replace(",", "")?.toDoubleOrNull() ?: 0.0
             val vendorMatch = TRF_TO_REGEX.find(message)
-            val vendor = vendorMatch?.groupValues[1]?.trim() ?: "Unknown"
+            val vendor = vendorMatch?.groupValues?.getOrNull(1)?.trim() ?: "Unknown"
             return ParsedTransaction(amount, TransactionType.EXPENSE, vendor)
         }
 
         // Income Check
-        val creditMatch = CREDIT_REGEX.find(message)
-        if (creditMatch != null) {
-            val amount = creditMatch.groupValues[1].replace(",", "").toDoubleOrNull() ?: 0.0
+        CREDIT_REGEX.find(message)?.let { match ->
+            val amount = match.groupValues.getOrNull(1)?.replace(",", "")?.toDoubleOrNull() ?: 0.0
             val vendorMatch = TRANSFER_FROM_REGEX.find(message)
-            val vendor = vendorMatch?.groupValues[1]?.trim() ?: "Unknown"
+            val vendor = vendorMatch?.groupValues?.getOrNull(1)?.trim() ?: "Unknown"
             return ParsedTransaction(amount, TransactionType.INCOME, vendor)
         }
 
         // Pending/Request Check
-        val requestMatch = REQUESTED_REGEX.find(message)
-        if (requestMatch != null) {
-            val amount = requestMatch.groupValues[1].replace(",", "").toDoubleOrNull() ?: 0.0
+        REQUESTED_REGEX.find(message)?.let { match ->
+            val amount = match.groupValues.getOrNull(1)?.replace(",", "")?.toDoubleOrNull() ?: 0.0
             val vendorMatch = REQUESTED_BY_REGEX.find(message) ?: FRM_U_REGEX.find(message)
-            val vendor = vendorMatch?.groupValues[1]?.trim() ?: "External Request"
+            val vendor = vendorMatch?.groupValues?.getOrNull(1)?.trim() ?: "External Request"
             return ParsedTransaction(amount, TransactionType.EXPENSE, vendor, isPending = true)
         }
 
